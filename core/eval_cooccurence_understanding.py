@@ -30,7 +30,7 @@ from UnderstandingVisualTextModels.models.CLIP import clip
 
 
 class OccurenceDataset(Dataset):
-    def __init__(self, annot_dir, image_root_original, image_root_modified, image_root_patch, subset=False):
+    def __init__(self, annot_dir, image_root_original, image_root_modified, image_root_patch):
         """
 
         :param annot_dir:
@@ -66,18 +66,6 @@ class OccurenceDataset(Dataset):
         self.coco_classes = self.coco_classes[self.coco_classes['class'] != 'apple']
         self.class_prompts = self.coco_classes['prompt'].values
         self.coco_classes = np.array(self.coco_classes['class'].values)
-
-        # TEMPORARY
-        if subset:
-            objects = dict()
-            for annot in self.annotations:
-                obj = annot['object']
-                if obj not in objects:
-                    objects[obj] = list()
-                if len(objects[obj]) < 16:
-                    objects[obj].append(annot)
-
-            self.annotations = np.concatenate([x for x in objects.values()])
 
     def __len__(self):
         return len(self.annotations)
@@ -152,21 +140,10 @@ def average_precision(target, output):
 
 def make_comparisons(gt_labels, label, single_object, other_objects, logits, results,
                      no_others_logits, new_label):
-    # gt_logits = normalize(logits[0]).cpu().numpy()
-    # patch_logits = normalize(logits[1]).cpu().numpy()
-    # mod_logits = normalize(logits[2]).cpu().numpy()
-    # gt_logits = logits[0].softmax(dim=0).cpu().numpy()
-    gt_no_others_logits = no_others_logits[0].softmax(dim=0).cpu().numpy()
-    # patch_logits = logits[1].softmax(dim=0).cpu().numpy()
-    patch_no_others_logits = no_others_logits[1].softmax(dim=0).cpu().numpy()
-    # mod_logits = logits[2].softmax(dim=0).cpu().numpy()
-    mod_no_others_logits = no_others_logits[2].softmax(dim=0).cpu().numpy()
-    # gt_ap = average_precision(gt_labels, gt_logits)
 
-    # All objects softmax, includes objects present in the image
-    # results['gt_all_objects_softmax'].append(gt_logits.tolist())
-    # results['patch_all_objects_softmax'].append(patch_logits.tolist())
-    # results['mod_all_objects_softmax'].append(mod_logits.tolist())
+    gt_no_others_logits = no_others_logits[0].softmax(dim=0).cpu().numpy()
+    patch_no_others_logits = no_others_logits[1].softmax(dim=0).cpu().numpy()
+    mod_no_others_logits = no_others_logits[2].softmax(dim=0).cpu().numpy()
 
     # single object softmax, softmax when the other objects in image are not compared to
     results['gt_single_object_softmax'].append(float(gt_no_others_logits[new_label]))
@@ -619,11 +596,6 @@ def get_logits(logit_scale, imf_i, text_f):
     return logit_scale * text_f @ imf_i.t()
 
 
-"""
-Below metrics inspired by Winoground
-https://huggingface.co/datasets/facebook/winoground/blob/main/statistics/compute_statistics.py
-"""
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Runs  a COCO based evaluation on CLIP.')
     parser.add_argument('--model', type=str, default='clip')
@@ -643,8 +615,7 @@ if __name__ == '__main__':
     # parser.add_argument('--batch_size', type=int, default=1)
     parser.add_argument('--num_workers', type=int, default=4)
 
-    # python UnderstandingVisualTextModels/core/eval_compositional_understanding.py  --model clip_vit --save_dir /home/schiappa/SRI/eval_TEST/
-    #  python eval_compositional_understanding.py --model vsrn_flicker --save_dir /home/schiappa/SRI/eval_vsrn
+
     args = parser.parse_args()
 
     # Build our save directory for results, must pass the top-level directory results are stored in

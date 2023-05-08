@@ -25,15 +25,13 @@ from UnderstandingVisualTextModels.models.CLIP import clip
 
 
 class VisualGenomeDataset(Dataset):
-    def __init__(self, annot_dir, image_root, switch_triplet='subject', subset=False):
+    def __init__(self, annot_dir, image_root, switch_triplet='subject'):
         assert switch_triplet in ['subject', 'object'], "Please pass either subject, or object for switch."
         self.switch_triplet = switch_triplet
 
         self.annotations = json.load(open(os.path.join(annot_dir, f'data/visual_genome/relation_eval_{switch_triplet}.json'), 'r'))
 
         self.image_ids = list(self.annotations.keys())
-        if subset:
-            self.image_ids = random.sample(self.image_ids, 5000)
         self.image_root = image_root
         self.transform_toTensor = torchvision.transforms.ToTensor()
         self.transform_toPIL = torchvision.transforms.ToPILImage()
@@ -198,18 +196,10 @@ def eval_finetuned_clip(model_weights, alpha, stream, model_name, pbar, results,
     logit_scale = model.logit_scale.exp().detach()
     for gt_image, positive_images, negative_images, positive_prompt, negative_prompt, image_id, negative_obj_prompts, positive_obj_prompts, negative_predicate_prompts in pbar:
         batch_size = len(gt_image)
-        # TEMPORARY FOR TESTING
-        # gt_image[-1].save('test/gt_image.jpg')
-        # for idx, img in enumerate(positive_images[-1]): img.save(f'test/positive_{idx}.jpg')
-        # for idx, img in enumerate(negative_images[-1]): img.save(f'test/negative_{idx}.jpg')
-        #0
+
         prompts = positive_prompt + negative_prompt + positive_obj_prompts + negative_obj_prompts + negative_predicate_prompts
         gt_images = torch.stack([preprocess(image) for image in gt_image]).to(device)
-        # positive_images = torch.stack([preprocess(image) for images in positive_images for image in images]).to(
-        #     device)
-        # negative_images = torch.stack([preprocess(image) for images in negative_images for image in images]).to(
-        #     device)
-        # full_images = torch.cat([gt_images, positive_images, negative_images])
+
         with torch.no_grad():
             # Get features
             visual_features = model.encode_image(gt_images)
@@ -226,12 +216,7 @@ def eval_finetuned_clip(model_weights, alpha, stream, model_name, pbar, results,
         # Split features
         rel1_img_features = visual_features[:batch_size]
         dims = visual_features.shape[-1]
-        # obj1_img_features = visual_features[batch_size: batch_size + (batch_size * 10)].reshape(batch_size, 10, dims)
-        # obj3_img_features = visual_features[
-        #                     (batch_size + (batch_size * 10)): (batch_size + (batch_size * 10)) + (batch_size * 10)].reshape(
-        #     batch_size, 10, dims)
 
-        # tokenized_prompts = torch.cat([clip.tokenize(p) for p in prompts]).to(device)
 
         rel1_prompt_txt_features = text_features[:batch_size]
         rel3_prompt_txt_features = text_features[batch_size: batch_size * 2]
@@ -333,12 +318,7 @@ def eval_finetuned_clip(model_weights, alpha, stream, model_name, pbar, results,
 
 def eval_clip(model_name, pbar, results, acc):
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    # if 'vit' in model_name:
-    #     logger.info("Building ViT based CLIP model...")
-    #     clip_model_type = 'ViT-L/14'
-    # else:
-    #     logger.info("Building ResNet101 based CLIP model...")
-    #     clip_model_type = 'RN101'
+
     clip_model_type = model_name.split('_')[-1]
     logger.info(f"Building {clip_model_type} based CLIP model...")
 

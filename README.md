@@ -70,8 +70,8 @@ A `log.txt` file will be produced and stored under:  `<save_dir>/relation_text_e
 
 Results for this will be stored in a json file under:
 
-* `<save_dir>/compositional_text_eval/<model>/results/<model>/eval_relation_understanding.json`
-* `<save_dir>/compositional_text_eval/<model>/results/<model>/eval_aggregated_relation_understanding.json`
+* `<save_dir>/relation_text_eval/<model>/results/<model>/eval_relation_understanding.json`
+* `<save_dir>/relation_text_eval/<model>/results/<model>/eval_aggregated_relation_understanding.json`
 
 The format of results for each aggregated `.json` are:
 ```json
@@ -194,7 +194,7 @@ done
 
 
 #### Output
-A `log.txt` file will be produced and stored under:  `<save_dir>/compositional_text_eval/<model>/log.txt`
+A `log.txt` file will be produced and stored under:  `<save_dir>/context_text_eval/<model>/log.txt`
 
 Results for this will be stored in a json file under:
 * `<save_dir>/context_text_eval/<model>/results/<model>/eval_context_background_<filler>_understanding.json`
@@ -218,6 +218,77 @@ The format of results for each aggregated `.json` are:
   "change_gt_mod_conf": <Mean change in logit scores between original image and background replaced image>, 
   "change_patch_mod_conf": <Mean change in logit scores between random patch image and background replaced image>, 
   "change_gt_patch_conf": <Mean change in logit scores between original image and background patch image>
+}
+```
+
+
+### Probe-B: Context/Background Understanding by Object Co-Occurence
+This compares images by changing the background AND other objects in the image. The first is the anchor image where 
+the image has the background replaced but all objects are present. 
+The next is an image with a random patch that does not cover any annotated objects. The third is where all background is
+replaced with a filler AND all other objects are removed. The model is being measured by how well it
+can detect the remaining object when all other objects are there compared to when they are not. The filler options are:
+* `black`
+* `gray`
+* `scene`
+* `noise`
+
+<p align="center">
+  <img src="images/ProbeB.png" />
+</p>
+
+#### Run Analysis
+An example on how to call for a specific model:
+```bash
+conda activate probe_v
+
+root_ima
+root_image_orig_dir=data/coco/val2014_background_removed_dataset
+root_image_patch_dir=data/coco/val2014_random_patch_dataset
+root_image_mod_dir=data/coco/val2014_background_removed_and_cooccurrence_dataset
+annot_dir=data/context
+save_dir=results
+
+FILL_TYPES="
+scene
+noise
+gray
+black
+"
+
+for FILL in $FILL_TYPES
+do
+    echo "Running ${MODEL} with fill ${FILL}"
+    python UnderstandingVisualTextModels/core/eval_cooccurence_understanding.py \
+                            --model bridgetower \
+                            --save_dir $save_dir \
+                            --root_image_mod_dir "${root_image_mod_dir}" \
+                            --root_image_patch_dir "${root_image_patch_dir}" \
+                            --root_image_orig_dir "${root_image_orig_dir}" \
+                            --annot_dir ${annot_dir} \
+                            --fill_type ${FILL}
+done
+```
+
+
+#### Output
+A `log.txt` file will be produced and stored under:  `<save_dir>/cooccurrence_text_eval/<model>/log.txt`
+
+Results for this will be stored in a json file under:
+* `<save_dir>/cooccurrence_text_eval/<model>/results/<model>/eval_aggregated_cooccurence_<filler>_understanding.json`
+* `<save_dir>/cooccurrence_text_eval/<model>/results/<model>/eval_cooccurence_<filler>_understanding.json`
+
+The format of results for each aggregated `.json` are:
+```json
+{
+  "all_objects_ap": [], 
+  "gt_single_object_acc": <acc of single object when background removed but all other objects present>, 
+  "patch_single_object_acc": <accuracy of single object when random patch in background>, 
+  "mod_single_object_acc": <acc of single object when both background and all other objects removed>,
+  
+  "gt_mod_change_conf": <change in logit score of single object when background removed vs. both background AND objects removed>, 
+  "gt_patch_change_conf": <change in logit score of single object when random patch in background vs. just background removed>, 
+  "patch_mod_change_conf": <change in logit score of single object when patch in background vs. background AND objects removed>,
 }
 ```
 
