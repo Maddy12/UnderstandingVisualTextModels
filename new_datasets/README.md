@@ -1,25 +1,20 @@
-# Model Understanding Benchmark
-These datasets are designed to be an easy-to-moderate task for visual-language contrastive models and measure how well
-these models understand. The idea is we want to know if models are using hacks or memorization as opposed to learned
+# Dataset for: Probing Conceptual Understanding of Large Visual-Language Models
+These datasets are designed to be an easy-to-moderate task for visual-language contrastive models to measure how well
+these models "understand". The idea is we want to know if models are using hacks or memorization as opposed to learned
 understanding of object-object relations, contextual relations to objects, object co-occurrences, and attribute-object 
 relations. 
 
 There are three types of datasets: context, composition, and relations.
 
 These datasets rely on [Visual Genome](http://visualgenome.org/api/v0/api_home.html) and [COCO validation 2014](https://cocodataset.org/#home).
-In order to use these annotations, downloading the orignal images is required. For COCO, `Val2014` is the only required while 
+In order to use these annotations, downloading the original images is required. For COCO, `Val2014` is the only required while 
 for Visual Genome the entire dataset. 
 
 ## Relational Dataset
-This dataset is built off of [Visual Genome](http://visualgenome.org/api/v0/api_home.html). This dataset was created by cleaning the annotations with relations 
-that are specifically an interaction rather than an attribute which was often an erroneous annotation and grouping
-relations that are the same despite spelling errors. Objects and predicates are additionally cleaned based on spelling 
-errors. Using the extracted (subject, predicate, object) triplets, unlikely relationships are determined if there is no
-existing combination of an object-predicate pair or subject-object pair. For each image, the ground truth relation is 
-compared to a highly unlikely swap of subject and predicate. There are set of "positive" images that are images with 
-the subject being swapped and no other objects from the original image. There are also a set of "negative" images that 
-are images with the swapped subject and no other objects from the original image. The predicate swapped is based on the 
-predicates that have not been found in the original dataset to be associated with the original subject and therefore are highly unlikely.
+This dataset is built off of [Visual Genome](http://visualgenome.org/api/v0/api_home.html). 
+For each image, the ground truth relation is compared to a highly unlikely swap of subject and predicate. 
+There are set of "positive" images that are images with the subject being swapped and no other objects from the original 
+image. The predicate swapped is based on the predicates that have not been found in the original dataset to be associated with the original subject and therefore are highly unlikely.
 
 The dataset stored in `relation_eval_subject.json` structure is as follows: 
 ```json
@@ -90,8 +85,6 @@ To evaluate on this dataset, multiple comparisons are made:
 * Anchor image compared to the ground truth prompt and a prompt with the predicate swapped
 * Anchor image compared to the ground truth prompt and a subject-only prompt (no relation)
 * Mean features of the subject-only "positive" images compared to subject-only prompt (no relation) and the anchor image"s relation prompt
-* Mean features of the subject-only "positive" images compared to the anchor image"s relation prompt and the anchor image"s relation prompt with a swapped subject
-* Mean features of the subject-only "positive" images compared the anchor image"s relation prompt and the anchor image"s relation prompt with a swapped predicate
 
 These comparisons are designed to tell us: 
 * `Rel1 vs. Rel3`: If the model is able to recognize an object is NOT present. 
@@ -99,15 +92,13 @@ These comparisons are designed to tell us:
 * `Obj1 vs. Rel1`: If the model ignores relationships all-together and focuses only on object recognition
 
 ## Compositional Dataset
-This dataset is built of the [COCO validation 2014](https://cocodataset.org/#home) dataset. Using the NLP library  
-[NLTK](https://www.nltk.org/) and the COCO caption annotations, words are tagged and pairs of adjective and nouns are 
-extracted. These pairs are then manually cleaned to ensure the attribute is indeed an adjective and the object is indeed 
-an object. Instead of using unlikely combinations, antonyms were manually mapped to each attribute in order to ensure 
+This dataset is built of the [COCO validation 2014](https://cocodataset.org/#home) dataset. Using the NLP library [NLTK](https://www.nltk.org/) and the COCO caption annotations, words are tagged and pairs of adjective and nouns are 
+extracted. Instead of using unlikely combinations, antonyms were manually mapped to each attribute in order to ensure 
 that the attribute is not present in the image. For example, if there is a "a small dog", the comparison prompt is 
 "a large dog"
 
-There are two splits for this dataset. The first is where the composition is swapped with an antonym and the other is 
-where an object is switched. Each dataset has two images and two captions and comparisons are based on how well the 
+There are two splits for this dataset. The first is where the **composition is swapped** with an antonym and the other is 
+where an **object is switched**. Each dataset has two images and two captions and comparisons are based on how well the 
 model can match the captions to the correct images. 
 
 ![Compositional Dataset Examples](images/ExampleComposition.jpg)
@@ -166,45 +157,27 @@ To evaluate on this dataset, multiple comparisons are made:
   * Text Accuracy: `Image1 + Prompt1 > Image1 + Prompt2 AND Image2 + Prompt2 > Image2 + Prompt2`
   * Image Accuracy: `Image1 + Prompt1 > Image2 + Propmt1 AND Image2 + Prompt2 > Image1 + Prompt2`
   * Group Accuracy: `Image Accuracy AND Text Accuracy`
-* Also look at the mean softmax value for the corract pairs to measure model confidence
+* Also look at the mean softmax value for the correct pairs to measure model confidence
   * `(Softmax(Image1+Prompt1, Image1+Prompt2)[0] + Softmax(Image2+Prompt2, Image2+Prompt1)[0]) /2`
 
 ## Context Dataset
 This dataset is built off [COCO validation 2014](https://cocodataset.org/#home) and looks at the co-occurrence between 
-objects and reliance on background cues. This dataset has modified images and can be downloaded [here]().
+objects and reliance on background cues. _This dataset will be released soon._
 
-The first set is used to evaluate co-occurence. For each image, it removes all other objects using either the segmentation
-(retaining shape cues) or bounding box annotations (no shape cues). These are replaced with either "black", "gray", or
-"noise". Images are chosen if they do not have overlapping bounding boxes and if their object area is over a threshold 
-to allow for better visibility, making the task easier.
 
-### Split1 Object Co-Occurrence:
-* 9,375 Images * 2 removal masks * 3 replacement fillings
-* 2,259 Original COCO images modified
-* 79 objects 
-* 
-![Example Object Co-Occurance Images](images/Cooccurence.png)
 
-Example annotations:
-```json
-[{"image_id": 136,
- "object": "person",
- "other_objects": ["giraffe"],
- "path": "person_COCO_val2014_000000000136.jpg"},
-{"image_id": 136,
- "object": "giraffe",
- "other_objects": ["person"],
- "path": "giraffe_COCO_val2014_000000000136.jpg"}
-]
-```
-
-### Split 2 Background Context:
-The second set removes backgrounds and replaces them with fillings of either "gray", "black", "noise" or some 
+### Split 1 Background Context:
+The first set removes backgrounds and replaces them with fillings of either "gray", "black", "noise" or some 
 landscape scenery from a subset of the [Kaggle Landscape dataset](https://www.kaggle.com/datasets/arnaud58/landscape-pictures/)
 and [Indoor Scenes dataset](https://web.mit.edu/torralba/www/indoor.html) from this [paper](http://people.csail.mit.edu/torralba/publications/indoor.pdf).
 The subset of 290 images were selected based on whether there were any objects in the image that are also in the annotations.
 
-![Example Object Background Removed Images](images/ExampleBackground.png). 
+![Example Object Background Removed Images](images/ExampleBackground.png)
+
+We additionally have an image where just one patch of the background is added to measure the change in performance
+to ANY minor change.
+
+![Example of image with patch](images/ExamplePatch.png)
 
 * 31,765 Images * 3 replacement fillings
 * 80 objects 
@@ -247,5 +220,30 @@ Example annotation:
     "id": 1817255}]},
  "image": "COCO_val2014_000000000042.jpg",
  "image_id": 42}]
+```
+
+### Split2 Object Co-Occurrence:
+The second set is used to evaluate co-occurrence. For each image, it removes all other objects using either the segmentation
+ AND the background. These are replaced with either "black", "gray", "scene" or
+"noise". Images are chosen if they do not have overlapping bounding boxes and if their object area is over a threshold 
+to allow for better visibility, making the task easier.
+
+* 9,375 Images * 4 replacement fillings
+* 2,259 Original COCO images modified
+* 79 objects 
+
+![Example Object Co-Occurance Images](images/Cooccurence.png)
+
+Example annotations:
+```json
+[{"image_id": 136,
+ "object": "person",
+ "other_objects": ["giraffe"],
+ "path": "person_COCO_val2014_000000000136.jpg"},
+{"image_id": 136,
+ "object": "giraffe",
+ "other_objects": ["person"],
+ "path": "giraffe_COCO_val2014_000000000136.jpg"}
+]
 ```
 
