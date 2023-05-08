@@ -183,7 +183,7 @@ to allow for better visibility, making the task easier.
 * 2,259 Original COCO images modified
 * 79 objects 
 * 
-![Example Object Co-Occurance Images](images/ExampleCoOccurance.png)
+![Example Object Co-Occurance Images](images/Cooccurence.png)
 
 Example annotations:
 ```json
