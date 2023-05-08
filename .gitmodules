@@ -1,12 +1,3 @@
-[submodule "models/CLIP"]
-	path = models/CLIP
-	url = https://github.com/openai/CLIP.git
-[submodule "models/VSRN"]
-	path = models/VSRN
-	url = https://github.com/KunpengLi1994/VSRN.git
-[submodule "models/vpt"]
-	path = models/vpt
-	url = https://github.com/KMnP/vpt.git
 [submodule "models/diffusion-classifier"]
 	path = models/diffusion-classifier
 	url = https://github.com/diffusion-classifier/diffusion-classifier.git
