@@ -247,3 +247,11 @@ Example annotations:
 ]
 ```
 
+# Related Asset & Acknowledgment
+Our work is relies on the open-source models built and inspired by several assets. 
+We gratefully thank the authors for their open-source projects that 
+allowed this benchmark to be possible:
+
+* [COCO Dataset](https://cocodataset.org/#home)
+* [Visual Genome Project](https://www.visualgenome.org/)
+* [NLTK](https://www.nltk.org/)

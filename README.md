@@ -294,6 +294,17 @@ The format of results for each aggregated `.json` are:
 }
 ```
 
+# Related Asset & Acknowledgment
+Our work is relies on the open-source models built and inspired by several assets. 
+We gratefully thank the authors for their open-source projects that 
+allowed this benchmark to be possible:
 
-
+* [COCO Dataset](https://cocodataset.org/#home)
+* [Visual Genome Project](https://www.visualgenome.org/)
+* [NLTK](https://www.nltk.org/)
+* [Bridgetower](https://github.com/microsoft/BridgeTower)
+* [ViLT](https://github.com/dandelin/ViLT)
+* [FLAVA](https://flava-model.github.io/)
+* [OpenAI CLIP](https://github.com/mlfoundations/open_clip)
+* [HuggingFace](https://huggingface.co/)
 
