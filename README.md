@@ -45,7 +45,7 @@ where no other objects from the original image are also present. The model is as
 to the anchor image with the additional comparison of object-only images to the ground-truth relation.
 
 <p align="center">
-  <img src="images/ProbeR.png" />
+  <img width="60%" height="30%" src="images/ProbeR.png" />
 </p>
 
 #### Run Analysis
@@ -98,7 +98,7 @@ and switching the object would show images with "a wooden bench" versus "a woode
 The model is "asked" to match the correct prompt to the correct image.
 
 <p align="center">
-  <img src="images/ProbeC.png" />
+  <img width="60%" height="30%" src="images/ProbeC.png" />
 </p>
 
 #### Run Analysis
@@ -159,7 +159,7 @@ replaced with a filler. The filler options are:
 * `noise`
 
 <p align="center">
-  <img src="images/ProbeB.png" />
+  <img width="60%" height="30%" src="images/ProbeB.png" />
 </p>
 
 #### Run Analysis
