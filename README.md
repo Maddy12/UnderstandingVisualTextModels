@@ -235,9 +235,6 @@ can detect the remaining object when all other objects are there compared to whe
 * `scene`
 * `noise`
 
-<p align="center">
-  <img src="images/ProbeB.png" />
-</p>
 
 #### Run Analysis
 An example on how to call for a specific model:
