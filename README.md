@@ -32,7 +32,7 @@ conda env create -f environment.yml
 ## Dataset
 Detailed information about the datasets are here: [README.md](new_datasets/README.md)
 
-Soon to be released. 
+Download data [here](https://www.crcv.ucf.edu/data1/probe_rcb/) 
 
 ## Usage
 ### Probe-R: Relational Understanding

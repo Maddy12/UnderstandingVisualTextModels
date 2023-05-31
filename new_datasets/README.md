@@ -10,6 +10,9 @@ These datasets rely on [Visual Genome](http://visualgenome.org/api/v0/api_home.h
 In order to use these annotations, downloading the original images is required. For COCO, `Val2014` is the only required while 
 for Visual Genome the entire dataset. 
 
+## Download
+This dataset can be downloaded from [here](https://www.crcv.ucf.edu/data1/probe_rcb/).
+
 ## Relational Dataset
 This dataset is built off of [Visual Genome](http://visualgenome.org/api/v0/api_home.html). 
 For each image, the ground truth relation is compared to a highly unlikely swap of subject and predicate. 
